@@ -3,8 +3,7 @@ import { card } from './card.js';
 
 export const comment = (() => {
     const send = async (button) => {
-        const id = button.getAttribute('data-uuid');
-
+        const origin = window.location.origin
         const name = document.getElementById('form-name');
         if (name.value.length == 0) {
             alert('Please fill name');
@@ -12,7 +11,8 @@ export const comment = (() => {
         }
 
         const presence = document.getElementById('form-presence');
-        if (!id && presence && presence.value == "0") {
+        const is_present = presence.value == "true" ? true : false;
+        if (presence && presence.value == "0") {
             alert('Please select presence');
             return;
         }
@@ -21,45 +21,43 @@ export const comment = (() => {
             presence.disabled = true;
         }
 
-        const form = document.getElementById(`form-${id ? `inner-${id}` : 'comment'}`);
+        const form = document.getElementById(`form-comment`);
         form.disabled = true;
 
-        const cancel = document.querySelector(`[onclick="comment.cancel('${id}')"]`);
-        if (cancel) {
-            cancel.disabled = true;
-        }
+        // const cancel = document.querySelector(`[onclick="comment.cancel('${id}')"]`);
+        // if (cancel) {
+        //     cancel.disabled = true;
+        // }
 
         const btn = util.disableButton(button);
 
-        const response = await request(HTTP_POST, '/api/comment')
-            .token(session.get('token'))
-            .body({
-                id: id,
+        $.ajax({
+            url: origin + "/api/comments",
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({
                 name: name.value,
-                presence: presence ? presence.value === "1" : true,
+                is_present: is_present,
                 comment: form.value
-            })
-            .then();
+            }),
+            success: function(data) {
+                form.disabled = false;
 
-        form.disabled = false;
-        if (cancel) {
-            cancel.disabled = false;
-        }
+                if (presence) {
+                    presence.disabled = false;
+                }
 
-        if (presence) {
-            presence.disabled = false;
-        }
+                btn.restore();
 
-        btn.restore();
-
-        if (response?.code === 201) {
-            owns.set(response.data.uuid, response.data.own);
-            form.value = null;
-            if (presence) {
-                presence.value = "0";
+                if (data?.status === 201) {
+                    form.value = null;
+                    if (presence) {
+                        presence.value = "0";
+                    }
+                    comment();
+                }
             }
-            comment();
-        }
+        });
     };
     const comment = async () => {
         card.renderLoading();
@@ -68,16 +66,15 @@ export const comment = (() => {
             url: origin + `/api/comments?per=${pagination.getPer()}&next=${pagination.getNext()}`,
             type: "get",
             success: function(data) {
-                console.log(data.data);
                 if (data.code !== 200) {
                     return;
                 }
     
                 const comments = document.getElementById('comments');
-                pagination.setResultData(data.data.length);
+                pagination.setResultData(data.total);
     
                 if (data.data.length === 0) {
-                    comments.innerHTML = `<div class="h6 text-center fw-bold p-4 my-3 bg-theme-${theme.isDarkMode('dark', 'light')} rounded-4 shadow">Yuk bagikan undangan ini biar banyak komentarnya</div>`;
+                    comments.innerHTML = `<div class="h6 text-center fw-bold p-4 my-3 rounded-4 shadow">Yuk bagikan undangan ini biar banyak komentarnya</div>`;
                     return;
                 }
     

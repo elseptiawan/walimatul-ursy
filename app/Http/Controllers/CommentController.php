@@ -31,7 +31,7 @@ class CommentController extends Controller
         $comment->is_present = $request->is_present;
         $comment->save();
 
-        return response()->json(['message' => 'Created'], 200);;
+        return response()->json(['message' => 'Created', 'status' => 201], 201);;
     }
 
     public function index(Request $request)
@@ -43,6 +43,7 @@ class CommentController extends Controller
 
         $offset = $request['next'] ? $request['next'] * $request['per'] : 0;
         $comments = Comment::with('user')->limit(10)->offset($offset)->orderBy('id', 'DESC')->get();
-        return response()->json(['data' => $comments, 'code' => 200], 200);
+        $count = Comment::count();
+        return response()->json(['data' => $comments, 'code' => 200, 'total' => $count], 200);
     }
 }

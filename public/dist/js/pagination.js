@@ -49,7 +49,7 @@ export const pagination = (() => {
 
     const setResultData = (len) => {
         resultData = len;
-        if (resultData < perPage) {
+        if (resultData < perPage * (pageNow + 1)) {
             disabledNext();
         }
     };
@@ -58,7 +58,7 @@ export const pagination = (() => {
         if (pageNow < 0) {
             disabledPrevious();
         } else {
-            pageNow -= perPage;
+            pageNow -= 1;
             disabledNext();
 
             await buttonAction(button, 'Previous');
@@ -72,10 +72,10 @@ export const pagination = (() => {
     };
 
     const next = async (button) => {
-        if (resultData < perPage) {
+        if (resultData < perPage * (pageNow + 1)) {
             disabledNext();
         } else {
-            pageNow += perPage;
+            pageNow += 1;
             disabledPrevious();
 
             await buttonAction(button, 'Next');

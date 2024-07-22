@@ -364,15 +364,15 @@
 
                     <div class="mb-3">
                         <label for="form-name" class="form-label">Nama</label>
-                        <input type="text" class="form-control shadow-sm" id="form-name" placeholder="Isikan Nama Anda">
+                        <input type="text" class="form-control shadow-sm" id="form-name" placeholder="Isikan Nama Anda" readonly>
                     </div>
 
                     <div class="mb-3">
                         <label for="form-presence" class="form-label" id="label-kehadiran">Kehadiran</label>
                         <select class="form-select shadow-sm" id="form-presence">
                             <option value="0" selected>Konfirmasi Kehadiran</option>
-                            <option value="1">Hadir</option>
-                            <option value="2">Berhalangan</option>
+                            <option value="true">Hadir</option>
+                            <option value="false">Berhalangan</option>
                         </select>
                     </div>
 
