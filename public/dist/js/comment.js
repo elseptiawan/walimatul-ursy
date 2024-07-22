@@ -65,7 +65,7 @@ export const comment = (() => {
         card.renderLoading();
         const origin = window.location.origin
         $.ajax({
-            url: origin + "/api/comments",
+            url: origin + `/api/comments?per=${pagination.getPer()}&next=${pagination.getNext()}`,
             type: "get",
             success: function(data) {
                 console.log(data.data);
